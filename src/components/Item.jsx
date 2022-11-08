@@ -25,7 +25,7 @@ export default function Item({ product }) {
 
         <CardActions sx={{ display: "flex", justifyContent: "center" }}>
           <Button>
-            <Link to={`/detalle/${product.id}`}>
+            <Link to={`/item/${product.id}`}>
               Ver detalle del Producto
             </Link>
           </Button>

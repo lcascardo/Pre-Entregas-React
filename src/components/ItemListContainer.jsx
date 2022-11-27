@@ -1,8 +1,10 @@
+import { CircularProgress } from '@mui/material';
+import { Container } from '@mui/system';
+import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Data from "../data/data.json";
 import ItemList from './ItemList';
-// import ItemCount from './ItemCount'
+
 
 export default function ItemListContainer() {
 
@@ -10,33 +12,40 @@ export default function ItemListContainer() {
 
   const [arrayDeProductos, setArrayDeProductos] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
-    let getData = new Promise((res, rej) => {
-      setTimeout(() => {
-        res(Data);
-      }, 1000);
-    })
+    setLoading(true);
+    const db = getFirestore();
+    let productos;
 
-    getData
-      .then((res) => {
-        if (categoryId) {
-          setArrayDeProductos(res.filter(item => item.category == categoryId));
-        }
-        else {
-          setArrayDeProductos(res);
-        }
-      });
+    if (categoryId) {
+      productos = query(collection(db, "productos"), where("category", "==", categoryId));
+    } else {
+      productos = collection(db, "productos");
+    }
 
-  }, [categoryId])
+    getDocs(productos)
+      .then(res => {
+        setArrayDeProductos(res.docs.map(element => ({ id: element.id, ...element.data() })));
+        setLoading(false);
+      })
 
-
-
-
+  }, [categoryId]);
 
   return (
     <>
-      <ItemList items={arrayDeProductos} />
+      {
+        loading ?
+          <Container sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+            <CircularProgress size={100} />
+          </Container>
+
+          :
+            <ItemList items={arrayDeProductos} />
+      }
+
     </>
   )
 }

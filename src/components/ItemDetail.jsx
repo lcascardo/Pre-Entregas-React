@@ -1,14 +1,34 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useCartContext } from '../context/CartContext';
+import ItemCount from './ItemCount';
+
+
 export default function ItemDetail({ data }) {
+
+  const [goToCart, setGoToCart] = useState(false);
+
+  const { addItem } = useCartContext();
+
+  function onAdd(quantity) {
+    setGoToCart(true);
+    addItem(data, quantity);
+  }
+
+
+
+
+
   return (
     <>
-      <Card sx={{ padding: "40px" }}>
+      <Card sx={{ padding: "40px" , width:"70%" }}>
 
         <Grid
           container
           justifyContent="center"
           alignItems="center"
+          direction="row"
         >
 
 
@@ -25,13 +45,19 @@ export default function ItemDetail({ data }) {
           <Grid item sm={12} md={6}>
 
             <CardContent>
-              <Typography variant="h3" color="initial" sx={{ textAlign: "center", padding: "20px" }}>{data.title}</Typography>
+              <Typography variant="h3" color="initial" sx={{ textAlign: "center", padding: "20px" }}>{data.name}</Typography>
               <Typography variant="h4" color="initial" sx={{ textAlign: "center" }}>${data.price}</Typography>
-              <Typography variant="subtitle1" color="initial" sx={{ textAlign: "center", padding: "20px" }}>{data.description}</Typography>
+              <Typography variant="h6" color="initial" sx={{ textAlign: "center", padding: "20px" }}>{data.description}</Typography>
             </CardContent>
 
             <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-              <Button variant='contained'>Agregar al Carrito</Button>
+              {
+                goToCart ?
+                  <Link to='/cart' style={{ textDecoration: "none" }}>
+                    <Button variant="contained">Terminar compra</Button>
+                  </Link> :
+                  <ItemCount initial={1} stock={data.quantity} onAdd={onAdd} />
+              }
             </CardActions>
 
             <CardContent>
